@@ -360,7 +360,7 @@ fn list_prices_limit_is_capped_at_100() {
     let env = Env::default();
     let (owner, client, _) = setup(&env);
     for i in 0..105 {
-        let offering_id = String::from_str(&env, &std::format!("offer-{}", i));
+        let offering_id = String::from_str(&env, &std::std::format!("offer-{}", i));
         client.set_price(&owner, &offering_id, &String::from_str(&env, "1"));
     }
     let prices = client.list_prices(&0, &200);

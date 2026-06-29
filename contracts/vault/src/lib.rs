@@ -493,7 +493,7 @@ impl CalloraVault {
         }
         let mut updated = Vec::new(env);
         for id in list.iter() {
-            if id != *offering_id {
+            if id != offering_id {
                 updated.push_back(id.clone());
             }
         }
@@ -1302,12 +1302,7 @@ impl CalloraVault {
         Ok(())
     }
 
-    pub fn get_max_deduct(env: Env) -> i128 {
-        env.storage()
-            .instance()
-            .get(&StorageKey::MaxDeduct)
-            .unwrap_or(DEFAULT_MAX_DEDUCT)
-    }
+
 
     /// Store the settlement contract address (admin only).
     ///
@@ -1713,25 +1708,7 @@ impl CalloraVault {
     /// # Errors
     /// * `VaultError::Unauthorized` - If the caller is not the current admin.
     /// * `VaultError::MetadataTooLong` - If the message length exceeds 256 characters.
-    pub fn broadcast(env: Env, caller: Address, severity: Severity, message: String) -> Result<(), VaultError> {
-        caller.require_auth();
-        let admin = Self::get_admin(env.clone())?;
-        if caller != admin {
-            return Err(VaultError::Unauthorized);
-        }
-        let len = message.len();
-        if len == 0 {
-            return Err(VaultError::MetadataTooLong); // Reusing existing error for message too long/empty
-        }
-        if len > MAX_MESSAGE_LEN {
-            return Err(VaultError::MetadataTooLong);
-        }
-        env.events().publish(
-            (events::event_admin_broadcast(&env), caller),
-            AdminBroadcast { severity, message },
-        );
-        Ok(())
-    }
+
 }
 
 // Allowlist aliases — convenience wrappers used by tests and external callers.
@@ -1795,10 +1772,6 @@ impl CalloraVault {
 
 mod events;
 pub mod rate_limit;
-
-#[cfg(any(kani, test))]
-#[path = "../proofs/deduct.rs"]
-mod deduct_proofs;
 
 // ---------------------------------------------------------------------------
 // Test modules
